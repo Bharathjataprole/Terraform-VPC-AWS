@@ -7,13 +7,16 @@ pipeline {
     }
 
     stages {
-        stage('Terraform Init') {
+        stage('checkout') {
             steps {
-                script {
-                    sh 'terraform init'
+                 script{
+                        dir("terraform")
+                        {
+                            git "https://github.com/Bharathjataprole/Terraform-Jenkins.git"
+                        }
+                    }
                 }
             }
-        }
 
         stage('Terraform Plan') {
             steps {
