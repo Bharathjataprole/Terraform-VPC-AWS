@@ -1,44 +1,54 @@
 pipeline {
-    agent any
-    
+
+    parameters {
+        booleanParam(name: 'autoApprove', defaultValue: false, description: 'Automatically run apply after generating plan?')
+    } 
     environment {
-        AWS_ACCESS_KEY_ID     = credentials('aws-access-key-id')
-        AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
+        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
     }
 
+   agent  any
     stages {
         stage('checkout') {
             steps {
                  script{
                         dir("terraform")
                         {
-                            git "https://github.com/Bharathjataprole/Terraform-VPC-AWS.git"
+                            git "https://github.com/Bharathjataprole/Terraform-Jenkins.git"
                         }
                     }
                 }
             }
 
-        stage('Terraform Plan') {
+        stage('Plan') {
             steps {
-                script {
-                    sh 'terraform plan -out=tfplan -input=false'
-                }
+                sh 'pwd;cd terraform/ ; terraform init'
+                sh "pwd;cd terraform/ ; terraform plan -out tfplan"
+                sh 'pwd;cd terraform/ ; terraform show -no-color tfplan > tfplan.txt'
             }
         }
+        stage('Approval') {
+           when {
+               not {
+                   equals expected: true, actual: params.autoApprove
+               }
+           }
 
-        stage('Terraform Apply') {
+           steps {
+               script {
+                    def plan = readFile 'terraform/tfplan.txt'
+                    input message: "Do you want to apply the plan?",
+                    parameters: [text(name: 'Plan', description: 'Please review the plan', defaultValue: plan)]
+               }
+           }
+       }
+
+        stage('Apply') {
             steps {
-                script {
-                    sh 'terraform apply -input=false tfplan'
-                }
+                sh "pwd;cd terraform/ ; terraform apply -input=false tfplan"
             }
         }
     }
 
-    post {
-        always {
-            // Clean up Terraform files
-            cleanWs()
-        }
-    }
-}
+  }
