@@ -2,12 +2,13 @@
 provider "aws" {
   region = "us-east-1"  # Change to your desired AWS region
 }
+resource "aws_instance" "demo-server" {
+  ami           = "ami-04a81a99f5ec58529"
+  instance_type = "t2.micro"
 
 # Create VPC
-resource "aws_vpc" "my_vpc" {
-  cidr_block = "10.0.0.0/16"
-  enable_dns_support = true
-  enable_dns_hostnames = true
+resource "aws_vpc" "demo-vpc" {
+  cidr_block = "10.10.0.0/16"
 }
 
 # Create internet gateway
@@ -16,13 +17,12 @@ resource "aws_internet_gateway" "my_igw" {
 }
 
 # Create public subnet
-resource "aws_subnet" "public_subnet" {
-  vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.1.0/24"
-  availability_zone = "us-east-1a"  # Change availability zone if needed
+resource "aws_subnet" "demo-subnet" {
+  vpc_id     = aws_vpc.demo-vpc.id
+  cidr_block = "10.10.1.0/24"
 
   tags = {
-    Name = "PublicSubnet"
+    Name = "demo-subnet"
   }
 }
 
