@@ -81,16 +81,5 @@ cidr_blocks     =  ["0.0.0.0/0"]
 ipv6_cidr_blocks = ["::/0"]
 
 }
-
-# Create EC2 instances
-resource "aws_instance" "public_instance" {
-  ami             = "ami-04a81a99f5ec58529"  # Replace with your desired AMI ID
-  instance_type   = "t2.micro"
-  subnet_id       = aws_subnet.public_subnet.id
-  associate_public_ip_address = true  # Ensure instance gets a public IP
-
-  tags = {
-    Name = "PublicInstance"
-  }
 }
 
