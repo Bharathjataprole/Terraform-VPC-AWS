@@ -2,9 +2,13 @@
 provider "aws" {
   region = "us-east-1"  # Change to your desired AWS region
 }
+# Create EC2 instances
 resource "aws_instance" "demo-server" {
   ami           = "ami-04a81a99f5ec58529"
   instance_type = "t2.micro"
+  subnet_id = aws_subnet.demo-subnet.id
+  vpc_security_group_ids = [aws_security_group.demo-secgrp.id]
+}
 
 # Create VPC
 resource "aws_vpc" "demo-vpc" {
@@ -12,8 +16,17 @@ resource "aws_vpc" "demo-vpc" {
 }
 
 # Create internet gateway
-resource "aws_internet_gateway" "my_igw" {
-  vpc_id = aws_vpc.my_vpc.id
+resource "aws_route_table" "demo-rt" {
+  vpc_id = aws_vpc.demo-vpc.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_route_table.demo-rt.id
+  }
+
+    tags = {
+    Name = "demo-rt"
+  }
 }
 
 # Create public subnet
@@ -23,17 +36,6 @@ resource "aws_subnet" "demo-subnet" {
 
   tags = {
     Name = "demo-subnet"
-  }
-}
-
-# Create private subnet
-resource "aws_subnet" "private_subnet" {
-  vpc_id            = aws_vpc.my_vpc.id
-  cidr_block        = "10.0.2.0/24"
-  availability_zone = "us-east-1b"  # Change availability zone if needed
-
-  tags = {
-    Name = "PrivateSubnet"
   }
 }
 
@@ -52,9 +54,32 @@ resource "aws_route_table" "public_route_table" {
 }
 
 # Associate public subnet with the public route table
-resource "aws_route_table_association" "public_subnet_association" {
-  subnet_id      = aws_subnet.public_subnet.id
+resource "aws_route_table_association" "demo-rt_assosiation" {
+  subnet_id      = aws_subnet.demo-subnet.id
   route_table_id = aws_route_table.public_route_table.id
+}
+# Security group
+resource "aws_security_group" "demo-secgrp" {
+  name        = "demo-secgrp"
+  description = "Allow TLS inbound traffic"
+  vpc_id      = aws_vpc.demo-vpc.id
+
+ingress {
+    description  = "TLS from VPC"
+    from port = 22
+    to_port   = 22
+    protocol  = "tcp"
+    cide_blocks = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+}
+
+egress {
+  from port     = 0
+  to_port       = 0
+protocol         = "-1"
+cidr_blocks     =  ["0.0.0.0/0"]
+ipv6_cidr_blocks = ["::/0"]
+
 }
 
 # Create EC2 instances
@@ -69,12 +94,3 @@ resource "aws_instance" "public_instance" {
   }
 }
 
-resource "aws_instance" "private_instance" {
-  ami           = "ami-04a81a99f5ec58529"  # Replace with your desired AMI ID
-  instance_type = "t2.micro"
-  subnet_id     = aws_subnet.private_subnet.id
-
-  tags = {
-    Name = "PrivateInstance"
-  }
-}
