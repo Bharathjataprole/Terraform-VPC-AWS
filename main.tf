@@ -63,7 +63,7 @@ resource "aws_security_group" "demo-secgrp" {
   name        = "demo-secgrp"
   description = "Allow TLS inbound traffic"
   vpc_id      = aws_vpc.demo-vpc.id
-
+}
 ingress {
     description  = "TLS from VPC"
     from port = 22
@@ -81,5 +81,5 @@ cidr_blocks     =  ["0.0.0.0/0"]
 ipv6_cidr_blocks = ["::/0"]
 
 }
-}
+
 
