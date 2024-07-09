@@ -2,26 +2,18 @@
 provider "aws" {
   region = "us-east-1"  # Change to your desired AWS region
 }
-# Create EC2 instances
-resource "aws_instance" "demo-server" {
-  ami           = "ami-04a81a99f5ec58529"
-  instance_type = "t2.micro"
-  subnet_id = aws_subnet.demo-subnet.id
-  vpc_security_group_ids = [aws_security_group.demo-secgrp.id]
-}
-
 # Create VPC
 resource "aws_vpc" "demo-vpc" {
   cidr_block = "10.10.0.0/16"
 }
 
 # Create internet gateway
-resource "aws_route_table" "demo-rt" {
+resource "aws_route_table" "demo-igw" {
   vpc_id = aws_vpc.demo-vpc.id
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_route_table.demo-rt.id
+    gateway_id = aws_route_table.demo-igw.id
   }
 
     tags = {
@@ -45,7 +37,7 @@ resource "aws_route_table" "public_route_table" {
 
   route {
     cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.my_igw.id
+    gateway_id = aws_internet_gateway.demo-igw.id
   }
 
   tags = {
@@ -80,6 +72,13 @@ protocol         = "-1"
 cidr_blocks     =  ["0.0.0.0/0"]
 ipv6_cidr_blocks = ["::/0"]
 
+}
+# Create EC2 instances
+resource "aws_instance" "demo-server" {
+  ami           = "ami-04a81a99f5ec58529"
+  instance_type = "t2.micro"
+  subnet_id = aws_subnet.demo-subnet.id
+  vpc_security_group_ids = [aws_security_group.demo-secgrp.id]
 }
 
 
