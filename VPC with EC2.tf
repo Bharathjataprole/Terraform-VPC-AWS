@@ -75,6 +75,7 @@ resource "aws_instance" "demo-server" {
   ami           = "ami-04a81a99f5ec58529"
   key_name = "jen-ter-private-kp"
   instance_type = "t2.micro"
+  availability_zone = "us-east-01"
   subnet_id = aws_subnet.demo-subnet.id
   vpc_security_group_ids = [aws_security_group.demo-secgrp.id]
 }
