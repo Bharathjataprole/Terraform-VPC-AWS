@@ -8,20 +8,16 @@ pipeline {
         AWS_SECRET_ACCESS_KEY = "HMTz4rNtJtIiOtK2FItSv3tcWCjyD/xfwJvOVk5K"
     }
 
-   agent  any
+   agent any
     stages {
         stage('Checkout') {
             steps {
                 checkout 'https://github.com/Bharathjataprole/Terraform-VPC-AWS.git'
             }
         }
-            steps {
-                sh '''
-                cd ${JENKINS_WORKSPACE}/Terraform-VPC-AWS
-                terraform init
-                terraform plan
-                terraform apply
-                '''
+            stage('Terraform Init')
+            stage('Terraform Plan')
+            stage('Terraform Apply')
         
         }
     }
