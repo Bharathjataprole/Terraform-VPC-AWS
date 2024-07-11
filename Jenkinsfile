@@ -10,7 +10,11 @@ pipeline {
 
    agent  any
     stages {
-        stage('init') {
+        stage('Checkout') {
+            steps {
+                checkout 'https://github.com/Bharathjataprole/Terraform-VPC-AWS.git'
+            }
+        }
             steps {
                 sh '''
                 cd ${JENKINS_WORKSPACE}/Terraform-VPC-AWS
