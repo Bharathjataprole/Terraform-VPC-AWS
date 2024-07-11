@@ -51,20 +51,4 @@ pipeline {
 
     }
 }
-                sh 'terraform init'
-            }
-        }
-        stage('Plan') {
-            steps {
-                sh 'terraform plan -out tfplan'
-                sh 'terraform show -no-color tfplan > tfplan.txt'
-            }
-        }
-        stage('Apply') {
-            steps {
-                sh 'terraform apply'
                 
-    }
-}
-    }
-}
