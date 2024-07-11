@@ -10,31 +10,15 @@ pipeline {
 
    agent  any
     stages {
-        stage('checkout') {
-            steps {
-                 script{
-                        dir("terraform")
-                        {
-                            git "https://github.com/Bharathjataprole/Terraform-VPC-AWS.git"
-                        }
-                    }
-                }
-            }
-
         stage('init') {
             steps {
-                sh 'terraform init'
-            }
-        }
-        stage('plan') {
-            steps {
-                sh 'terraform plan'
-            }
-        }
-        stage('apply') {
-            steps {
-                sh 'terraform apply'
-            }
+                sh '''
+                cd ${JENKINS_WORKSPACE}/Terraform-VPC-AWS
+                terraform init
+                terraform plan
+                terraform apply
+                '''
+        
         }
     }
 
