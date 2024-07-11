@@ -13,6 +13,8 @@ pipeline {
                 checkout 'https://github.com/Bharathjataprole/Terraform-VPC-AWS.git'
             }
         }
+            
+        stages {
             stage('Terraform Init')
             stage('Terraform Plan')
             stage('Terraform Apply')
